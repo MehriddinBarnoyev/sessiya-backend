@@ -3,6 +3,8 @@
 const pool = require("../../config/db");
 
 const addVenue = async (req, res) => {
+  console.log('started addVenue');
+  console.log("Request body:", req.body);
   const {
     name,
     district,
@@ -12,11 +14,13 @@ const addVenue = async (req, res) => {
     phoneNumber,
     description,
     ownerId,
-  } = req.body;
+  } = req.body;  
 
   if (!name || !district || !address || !capacity || !pricePerSeat || !phoneNumber || !ownerId) {
     return res.status(400).json({ message: "Barcha maydonlar to'ldirilishi kerak" });
   }
+  console.log("Received data:", req.body);
+  
 
   try {
     const result = await pool.query(

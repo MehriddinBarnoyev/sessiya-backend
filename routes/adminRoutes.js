@@ -13,10 +13,17 @@ const deleteVenue = require("../controllers/admin/deleteVenue");
 const getAllBookings = require("../controllers/admin/getAllBookings");
 const deleteBooking = require("../controllers/admin/deleteBooking");
 const createAdmin = require("../controllers/admin/createAdmin");
+const getAllOwners = require("../controllers/admin/getAllOwners");
+const getAllVenues = require("../controllers/admin/getAllVenues");
+const getVenueById = require("../controllers/admin/getVenueById");
+
 
 
 router.post("/create", authMiddleware, adminOnly, createAdmin);
 router.post("/owners", authMiddleware, adminOnly, createVenueOwner);
+router.get("/venuesAll", authMiddleware, adminOnly, getAllVenues);
+router.get("/venues/:id",  getVenueById);
+router.get("/ownersAll", authMiddleware, adminOnly, getAllOwners);
 router.post("/venues", authMiddleware, adminOnly, addVenue);
 router.patch("/venues/:id/confirm", authMiddleware, adminOnly, confirmVenue);
 router.patch("/venues/:id", authMiddleware, adminOnly, upload.array("photos", 10), updateVenue);
