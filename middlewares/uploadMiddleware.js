@@ -3,6 +3,8 @@ const path = require("path");
 const fs = require("fs");
 
 const uploadPath = path.join(__dirname, "../uploads");
+
+// Create the uploads directory if it doesn't exist
 if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath);
 
 const storage = multer.diskStorage({
@@ -15,10 +17,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
-    cb(null, validTypes.includes(file.mimetype));
+    if (validTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Fayl turi noto‘g‘ri. Faqat jpeg, png, yoki webp yuklash mumkin."));
+    }
   },
 });
 

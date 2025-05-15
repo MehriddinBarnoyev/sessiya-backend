@@ -5,6 +5,8 @@ const pool = require("../../config/db");
 const getMyBookings = async (req, res) => {
     const { phoneNumber } = req.query;
 
+    console.log("Phone number:", phoneNumber);
+
     if (!phoneNumber) {
         return res.status(400).json({ message: "Telefon raqam kerak" });
     }
@@ -12,18 +14,21 @@ const getMyBookings = async (req, res) => {
     try {
         const result = await pool.query(
             `
-      SELECT 
-        b.BookingID,
-        v.Name AS VenueName,
-        b.BookingDate,
-        b.NumberOfGuests,
-        b.Status
-      FROM Booking b
-      JOIN "User" u ON b.UserID = u.UserID
-      JOIN Venue v ON b.VenueID = v.VenueID
-      WHERE u.PhoneNumber = $1
-      ORDER BY b.BookingDate ASC
-    `,
+            SELECT 
+            b.bookingid,
+            v.name AS venuename,
+            v.district,
+            b.bookingdate,
+            b.numberofguests,
+            b.firstname || ' ' || b.lastname AS userfullname,
+            b.phonenumber,
+            b.status
+            FROM booking b
+            JOIN venue v ON b.venueid = v.venueid
+            WHERE b.phonenumber = $1
+            ORDER BY b.bookingdate ASC;
+
+            `,
             [phoneNumber]
         );
 
