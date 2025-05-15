@@ -5,9 +5,11 @@ const { hashPassword } = require("../../utils/hash");
 const createVenueOwner = async (req, res) => {
   const { firstName, lastName, username, password, phoneNumber, email } = req.body;
 
-  if (!firstName || !lastName || !username || !password || !phoneNumber) {
-    return res.status(400).json({ message: "Barcha maydonlarni to'ldiring" });
-  }
+  console.log("Request body:", req.body);
+  
+  // if (!firstName || !lastName || !username || !password || !phoneNumber) {
+  //   return res.status(400).json({ message: "Barcha maydonlarni to'ldiring" });
+  // }
 
   try {
     const check = await pool.query("SELECT * FROM VenueOwner WHERE Username = $1", [username]);

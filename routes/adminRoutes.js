@@ -16,18 +16,21 @@ const createAdmin = require("../controllers/admin/createAdmin");
 const getAllOwners = require("../controllers/admin/getAllOwners");
 const getAllVenues = require("../controllers/admin/getAllVenues");
 const getVenueById = require("../controllers/admin/getVenueById");
+const getVenuesByOwner = require("../controllers/admin/getVenuesByOwner");
+
 
 
 
 router.post("/create", authMiddleware, adminOnly, createAdmin);
-router.post("/owners", authMiddleware, adminOnly, createVenueOwner);
+router.post("/create-owners", authMiddleware, adminOnly, createVenueOwner);
 router.get("/venuesAll", authMiddleware, adminOnly, getAllVenues);
 router.get("/venues/:id",  getVenueById);
 router.get("/ownersAll", authMiddleware, adminOnly, getAllOwners);
-router.post("/venues", authMiddleware, adminOnly, addVenue);
-router.patch("/venues/:id/confirm", authMiddleware, adminOnly, confirmVenue);
+router.post("/create-venue", authMiddleware, adminOnly, addVenue);
+router.get("/owners/:ownerId/venues", authMiddleware, adminOnly, getVenuesByOwner);
+router.patch("/venues/:id/confirm", confirmVenue);
 router.patch("/venues/:id", authMiddleware, adminOnly, upload.array("photos", 10), updateVenue);
-router.delete("/venues/:id", authMiddleware, adminOnly, deleteVenue);
+router.delete("/venues/:id",  deleteVenue);
 router.get("/bookings", authMiddleware, adminOnly, getAllBookings);
 router.delete("/bookings/:id", authMiddleware, adminOnly, deleteBooking);
 

@@ -10,7 +10,7 @@ const updateMyVenue = require("../controllers/owner/updateMyVenue");
 const getMyBookings = require('../controllers/owner/getMyBookings')
 const cancelBooking = require('../controllers/owner/cancelBooking');
 
-router.post("/venues", authMiddleware, ownerOnly, addVenue);
+router.post("/create-venue", authMiddleware, ownerOnly, addVenue);
 router.patch("/venues/:id", authMiddleware, ownerOnly, upload.array("photos", 10), updateMyVenue);
 router.get("/bookings", authMiddleware, ownerOnly, getMyBookings);
 router.delete("/bookings/:id", authMiddleware, ownerOnly, cancelBooking);
