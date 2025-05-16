@@ -16,8 +16,14 @@ const getVenueById = async (req, res) => {
             return res.status(404).json({ message: "Venue topilmadi" });
         }
 
+        console.log("Venue details:", result.rows[0]);
+        
         res.status(200).json({
-            owners: result.rows,
+            venue: {
+                ...result.rows[0],
+                photos: result.rows[0].photos,
+                bookedDates: result.rows[0].bookeddates,
+            },
         });
     } catch (err) {
         res.status(500).json({ message: "Server xatosi", error: err.message });
