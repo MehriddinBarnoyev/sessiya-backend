@@ -15,9 +15,6 @@ const getVenueById = async (req, res) => {
         if (result.rowCount === 0) {
             return res.status(404).json({ message: "Venue topilmadi" });
         }
-
-        console.log("Venue details:", result.rows[0]);
-        
         res.status(200).json({
             venue: {
                 ...result.rows[0],

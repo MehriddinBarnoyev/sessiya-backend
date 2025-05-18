@@ -1,25 +1,35 @@
 const pool = require("../../config/db");
 
 const getVenuesByOwner = async (req, res) => {
-  const { ownerId } = req.params;
+  const { ownerId } = req.body;
 
   try {
     const result = await pool.query(
       `SELECT 
-        venueid,
-        name,
-        district,
-        address,
-        capacity,
-        priceperseat,
-        phonenumber,
-        description,
-        status,
-        createdat,
-        updatedat
-      FROM venue
-      WHERE ownerid = $1
-      ORDER BY createdat DESC`,
+  v.venueid,
+  v.name,
+  v.district,
+  v.address,
+  v.capacity,
+  v.priceperseat,
+  v.phonenumber,
+  v.description,
+  v.status,
+  v.createdat,
+  v.updatedat,
+  p.photourl
+FROM venue v
+LEFT JOIN LATERAL (
+  SELECT photourl
+  FROM photo
+  WHERE photo.venueid = v.venueid
+  ORDER BY photo.uploadedat ASC
+  LIMIT 1
+) p ON true
+WHERE v.ownerid = $1
+ORDER BY v.createdat DESC;
+
+      `,
       [ownerId]
     );
 

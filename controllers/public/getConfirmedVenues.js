@@ -1,42 +1,67 @@
-// controllers/public/getConfirmedVenues.js
-
 const pool = require("../../config/db");
 
 const getConfirmedVenues = async (req, res) => {
   const { sort, district, search } = req.query;
 
   try {
-    let query = `SELECT * FROM Venue WHERE Status = 'Confirmed'`;
+    let baseQuery = `
+      SELECT 
+        v.venueid,
+        v.name,
+        v.district,
+        v.address,
+        v.capacity,
+        v.priceperseat,
+        v.phonenumber,
+        v.description,
+        v.status,
+        v.ownerid,
+        v.createdat,
+        v.updatedat,
+        p.photourl
+      FROM venue v
+      LEFT JOIN LATERAL (
+        SELECT photourl
+        FROM photo
+        WHERE photo.venueid = v.venueid
+        ORDER BY uploadedat ASC
+        LIMIT 1
+      ) p ON true
+      WHERE v.status = 'Confirmed'
+    `;
+
     const values = [];
 
     // 🔍 Search
     if (search) {
       values.push(`%${search.toLowerCase()}%`);
-      query += ` AND LOWER(Name) LIKE $${values.length}`;
+      baseQuery += ` AND LOWER(v.name) LIKE $${values.length}`;
     }
 
     // 🏙 District filter
     if (district) {
       values.push(district);
-      query += ` AND District = $${values.length}`;
+      baseQuery += ` AND v.district = $${values.length}`;
     }
 
     // ↕️ Sorting
     if (sort === "price_asc") {
-      query += ` ORDER BY PricePerSeat ASC`;
+      baseQuery += ` ORDER BY v.priceperseat ASC`;
     } else if (sort === "price_desc") {
-      query += ` ORDER BY PricePerSeat DESC`;
+      baseQuery += ` ORDER BY v.priceperseat DESC`;
     } else if (sort === "capacity_asc") {
-      query += ` ORDER BY Capacity ASC`;
+      baseQuery += ` ORDER BY v.capacity ASC`;
     } else if (sort === "capacity_desc") {
-      query += ` ORDER BY Capacity DESC`;
+      baseQuery += ` ORDER BY v.capacity DESC`;
     } else {
-      query += ` ORDER BY CreatedAt DESC`; // default
+      baseQuery += ` ORDER BY v.createdat DESC`; // default
     }
 
-    const result = await pool.query(query, values);
+    const result = await pool.query(baseQuery, values);
+
     res.json({ venues: result.rows });
   } catch (err) {
+    console.error("Error in getConfirmedVenues:", err);
     res.status(500).json({ message: "Xatolik yuz berdi", error: err.message });
   }
 };

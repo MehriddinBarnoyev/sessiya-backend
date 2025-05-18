@@ -9,7 +9,7 @@ const updateMyVenue = async (req, res) => {
     const files = req.files;
 
     if (Object.keys(updates).length === 0 && (!files || files.length === 0)) {
-        return res.status(400).json({ message: "Kamida bitta maydon yoki rasm yuboring" });
+        return res.status(400).json({ message: "Kamida bitta rasm yuboring" });
     }
 
     try {

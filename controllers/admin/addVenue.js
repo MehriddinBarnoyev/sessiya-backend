@@ -1,63 +1,72 @@
 const pool = require("../../config/db");
 
 const addVenue = async (req, res) => {
+  const data = req.body;
+  const files = req.files;
+
   console.log("addVenue called");
-  console.log("req.body:", req.body);
-  
-  let venueData;
-  try {
-    venueData = JSON.parse(req.body.venueData);
-  } catch (err) {
-    return res.status(400).json({ message: "venueData noto‘g‘ri formatda" });
-  }
-
-  const {
-    name,
-    district,
-    address,
-    capacity,
-    pricePerSeat,
-    phoneNumber,
-    description,
-    ownerId,
-  } = venueData;
-
-  const photos = req.files;
-
-  if (!name || !district || !address || !capacity || !pricePerSeat || !phoneNumber || !ownerId) {
-    return res.status(400).json({ message: "Barcha maydonlar to‘ldirilishi kerak" });
-  }
+  console.log("req.body:", data);
+  console.log("req.files:", files);
 
   try {
-    const venueResult = await pool.query(
-      `INSERT INTO venue
-      (name, district, address, capacity, priceperseat, phonenumber, description, ownerid, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Unconfirmed' )
-      RETURNING *`,
-      [name, district, address, capacity, pricePerSeat, phoneNumber, description || null, ownerId]
-    );
+    // 1. Kerakli maydonlar borligini tekshirish
+    const requiredFields = [
+      "name",
+      "description",
+      "capacity",
+      "pricePerSeat",
+      "district",
+      "address",
+      "ownerId"
+    ];
 
-    const venue = venueResult.rows[0];
-
-    if (photos && photos.length > 0) {
-      const insertPhotos = photos.map((file) => {
-        const photoUrl = `/uploads/${file.filename}`;
-        return pool.query(
-          `INSERT INTO photo (venueid, photourl) VALUES ($1, $2)`,
-          [venue.venueid, photoUrl]
-        );
-      });
-
-      await Promise.all(insertPhotos);
+    for (const field of requiredFields) {
+      if (!data[field]) {
+        return res.status(400).json({ message: `${field} is required` });
+      }
     }
 
-    res.status(201).json({
-      message: "To‘yxona muvaffaqiyatli qo‘shildi",
-      venue,
-    });
-  } catch (err) {
-    console.error("Add venue error:", err);
-    res.status(500).json({ message: "Xatolik yuz berdi", error: err.message });
+    // 2. Venue qo‘shish
+    const insertQuery =
+      `INSERT INTO venue
+    (name, description, capacity, priceperseat, district, address, phonenumber, ownerid, status)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Unconfirmed')
+    RETURNING *`;
+
+    const values = [
+      data.name,
+      data.description,
+      Number(data.capacity),
+      Number(data.pricePerSeat),
+      data.district,
+      data.address,
+      data.phoneNumber || null,
+      data.ownerId,
+    ];
+
+    const result = await pool.query(insertQuery, values);
+    const newVenue = result.rows[0];
+
+    // 3. Rasmlarni Photo jadvaliga yozish
+    const insertedPhotos = [];
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const photoRes = await pool.query(
+          `INSERT INTO Photo (VenueID, PhotoURL) VALUES ($1, $2) RETURNING *`,
+          [newVenue.venueid, file.filename]
+        );
+        insertedPhotos.push(photoRes.rows[0]);
+      }
+
+      res.status(201).json({
+        message: "Venue qo‘shildi",
+        venue: newVenue,
+        photos: insertedPhotos,
+      });
+    }
+  } catch (error) {
+    console.error("Error in addVenue:", error);
+    res.status(500).json({ message: "Server xatosi", error: error.message });
   }
 };
 

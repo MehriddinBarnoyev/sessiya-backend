@@ -7,6 +7,10 @@ const updateVenue = async (req, res) => {
     const updates = req.body;
     const files = req.files;
 
+    console.log(req.body, "req.body");
+    console.log(req.files, "req.files");
+    console.log(venueId, "venueId");
+    
     try {
         // 1. Dinamik UPDATE
         const fields = [];

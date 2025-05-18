@@ -43,7 +43,7 @@ const addVenue = async (req, res) => {
     // 2. Rasm(lar)ni Photo jadvaliga qo‘shish
     if (photos && photos.length > 0) {
       const insertPhotoPromises = photos.map((file) => {
-        const photoUrl = `/uploads/${file.filename}`;
+        const photoUrl = `${file.filename}`;
         return pool.query(
           `INSERT INTO photo (venueid, photourl) VALUES ($1, $2)`,
           [venue.venueid, photoUrl]
