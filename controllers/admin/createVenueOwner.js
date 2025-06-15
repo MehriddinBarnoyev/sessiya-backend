@@ -3,7 +3,7 @@
 const pool = require("../../config/db");
 const { hashPassword } = require("../../utils/hash");
 const createVenueOwner = async (req, res) => {
-  const { firstname, lastname, username, password, phoneNumber, email } = req.body;
+  const { firstname, lastname, username, password, phonenumber, email } = req.body;
 
   console.log("Request body:", req.body);
   
@@ -19,9 +19,9 @@ const createVenueOwner = async (req, res) => {
 
     const hashed = await hashPassword(password);
     const result = await pool.query(
-      `INSERT INTO VenueOwner (FirstName, LastName, Username, Password, PhoneNumber, Email)
+      `INSERT INTO VenueOwner (firstname, lastname, username, password, phonenumber, email)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [firstname, lastname, username, hashed, phoneNumber, email || null]
+      [firstname, lastname, username, hashed, phonenumber, email || null]
     );
 
     const owner = result.rows[0];

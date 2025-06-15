@@ -4,7 +4,7 @@ const getOwnerVenues = async (req, res) => {
     const { ownerId } = req.body;
 
     console.log("Owner ID:", ownerId);
-    
+
     try {
         const result = await pool.query(
             `SELECT 
